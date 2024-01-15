@@ -12,5 +12,12 @@ class bacteria:
         self.velocity = 20 # velocity in micrometers / second
 
     def step():
-        pass
+        
+        # draw random angle from normal distribution
+        angle = np.random.normal(self.mean_angle)
+        self.looking_at = np.array([[np.cos(angle), -np.sin(angle)],
+                                    [np.sin(angle), np.cos(angle)]]) @ self.looking_at
+
+        runtime = np.random.exponential(self.mean_runtime)
+        self.pos += self.looking_at * runtime * self.velocity
 
