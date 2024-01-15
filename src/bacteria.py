@@ -11,7 +11,7 @@ class bacteria:
         self.mean_runtime = 1 # runtime in seconds
         self.velocity = 20 # velocity in micrometers / second
 
-    def step():
+    def step(self):
         
         # draw random angle from normal distribution
         angle = np.random.normal(self.mean_angle)
