@@ -101,7 +101,7 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
     #################################
     print(">>> Calculating tumble angles...")
     t1 = time.time()
-    angles = np.memmap(os.path.join(out, "angles.npy"), mode="w+", dtype = dtype, shape = times.shape)
+    angles = np.memmap(os.path.join(out, "_angles.npy"), mode="w+", dtype = dtype, shape = times.shape)
     angles += np.random.normal(loc = alpha, scale = angle_variance, size = times.shape)
 
     t2 = time.time()
@@ -114,7 +114,7 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
     t1 = time.time()
 
     # every bacteria looks in direction (1, 0) initially
-    looking_ats = np.memmap(os.path.join(out, "looking_ats.npy"), mode="w+", dtype = dtype, shape = (len(angles), N, 2))
+    looking_ats = np.memmap(os.path.join(out, "_looking_ats.npy"), mode="w+", dtype = dtype, shape = (len(angles), N, 2))
     looking_ats += np.array([1, 0])
 
     # we start with a tumble
@@ -135,7 +135,7 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
         looking_ats[i] = np.diagonal(t).transpose()
     
     # normalize looking_ats
-    looking_ats_normalized = np.memmap(os.path.join(out, "looking_ats_normalized.npy"), mode="w+", dtype = dtype, shape = (len(angles), N, 2))
+    looking_ats_normalized = np.memmap(os.path.join(out, "_looking_ats_normalized.npy"), mode="w+", dtype = dtype, shape = (len(angles), N, 2))
     looking_ats_norm = np.linalg.norm(looking_ats, 1, axis=2, keepdims=True)
     looking_ats_normalized += looking_ats / looking_ats_norm
     t2 = time.time()
@@ -148,7 +148,7 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
     t1 = time.time()
     
     # every bacteria starts at (0, 0)
-    pos = np.memmap(os.path.join(out, "positions.npy"), mode="w+", dtype = dtype, shape = looking_ats.shape)
+    pos = np.memmap(os.path.join(out, "_positions.npy"), mode="w+", dtype = dtype, shape = looking_ats.shape)
     
     # now let the bacteria run
     for i in range(1, len(angles)):
@@ -165,3 +165,16 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
     print("=============================================================================")
     print(">>> Overall Memory usage:")
     display_top(s, limit = 5)
+
+    print(">>> Saving states to disk...")
+    remap(angles, os.path.join(out, "angles.npy"))
+    remap(looking_ats_normalized, os.path.join(out, "looking_ats.npy"))
+    remap(pos, os.path.join(out, "positions.npy"))
+
+    print(">>> Cleaning up temporary files...")
+    os.remove(os.path.join(out, "_angles.npy"))
+    os.remove(os.path.join(out, "_looking_ats.npy"))
+    os.remove(os.path.join(out, "_looking_ats_normalized.npy"))
+    os.remove(os.path.join(out, "_positions.npy"))
+
+    print(">>> Finished!")
