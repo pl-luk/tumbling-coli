@@ -103,6 +103,7 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
     t1 = time.time()
     angles = np.memmap(os.path.join(out, "angles.npy"), mode="w+", dtype = dtype, shape = times.shape)
     angles += np.random.normal(loc = alpha, scale = angle_variance, size = times.shape)
+
     t2 = time.time()
     print(f">>> Took {np.round(t2 - t1, 2)} seconds")
 
@@ -119,10 +120,10 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
     # we start with a tumble
     r = np.array([[np.cos(angles[0]), -np.sin(angles[0])],
                       [np.sin(angles[0]), np.cos(angles[0])]]).transpose(2, 0, 1)
-
-    for j in range(len(r)):
-        looking_ats[0][j] = r[j] @ looking_ats[0][j]
-
+    
+    t = np.tensordot(r, looking_ats[0], axes=(1, 1)).transpose(2, 0, 1)
+    looking_ats[0] = np.diagonal(t).transpose()
+    
     # now let the bacteria tumble
     for i in range(1, len(angles)):
         
@@ -130,13 +131,8 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
         r = np.array([[np.cos(angles[i]), -np.sin(angles[i])],
                       [np.sin(angles[i]), np.cos(angles[i])]]).transpose(2, 0, 1)
         
-        # This:
-        # for j in range(len(r)):
-        #     looking_ats[i][j] = np.dot(r[j], looking_ats[i - 1][j])
-        # takes twice as long as:
-        t = np.tensordot(r, looking_ats[i], axes=(1, 1)).transpose(0, 2, 1)
-        for j in range(len(t)):
-            looking_ats[i][j] = t[j][j]
+        t = np.tensordot(r, looking_ats[i - 1], axes=(1, 1)).transpose(0, 2, 1)
+        looking_ats[i] = np.diagonal(t).transpose()
     
     # normalize looking_ats
     looking_ats_normalized = np.memmap(os.path.join(out, "looking_ats_normalized.npy"), mode="w+", dtype = dtype, shape = (len(angles), N, 2))
