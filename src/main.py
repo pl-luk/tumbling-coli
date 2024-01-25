@@ -15,8 +15,8 @@ def simulate(N, t, v, tau, alpha):
     
         for bac in bac_array:
             if bac.total_runtime < t:
-
                 bac.step()
+            else:
                 i += 1
 
 
