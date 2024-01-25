@@ -85,7 +85,7 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
     # Generate time blocks until every bacteria has run at least t seconds
     while shortest_time < t:
 
-        time_chunk = np.random.exponential(alpha, size = (chunk_size, N))
+        time_chunk = np.random.exponential(tau, size = (chunk_size, N))
         time_blocks.append(time_chunk)
         cum_time += time_chunk.sum(axis=0)
 
