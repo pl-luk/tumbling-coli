@@ -1,9 +1,12 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 import tracemalloc
 import linecache
 import time
+import argparse
 
 # Just a helper function to analyse memory consumption
 def display_top(snapshot, key_type='lineno', limit=3):
@@ -178,3 +181,20 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
     os.remove(os.path.join(out, "_positions.npy"))
 
     print(">>> Finished!")
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description = "Run-and-tumble of E. coli")
+
+    parser.add_argument("nbac", metavar = "N", type = int, help = "The amount of E.coli simulated")
+    parser.add_argument("time", metavar = "t", type = float, help = "The simulation time in seconds")
+    parser.add_argument("-v", "--velocity", type = float, default = 20., help = "The velocity of the bacteria in micrometers per second")
+    parser.add_argument("-t", "--tau", type = float, default = 1, help = "The mean runtime")
+    parser.add_argument("-a", "--alpha", type = float, default = np.deg2rad(70), help = "The mean turning angle")
+    parser.add_argument("-av", "--variance", type = float, default = 1., help = "The angle variance")
+    parser.add_argument("-c", "--chunk-size", type = int, default = 1000, help = "The time chunk size")
+    parser.add_argument("-o", "--out", type = str, default = "./data", help = "The output path for the generated data")
+
+    args = parser.parse_args()
+    sim(args.nbac, args.time, args.chunk_size, args.velocity, args.tau, args.alpha, args.variance,
+        args.out, dtype = np.float64)
