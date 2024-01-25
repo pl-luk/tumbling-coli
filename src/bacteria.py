@@ -2,14 +2,15 @@ import numpy as np
 
 class bacteria:
 
-    def __init__(self):
+    def __init__(self, v = 20, alpha = np.deg2rad(70), tau = 1):
 
         self.looking_at = np.array([1., 0.], dtype = np.float64)
         self.pos = np.array([0., 0.], dtype = np.float64)
+        self.total_runtime = 0
 
-        self.mean_angle = 70 * np.pi / 180 # angle in rad
-        self.mean_runtime = 1 # runtime in seconds
-        self.velocity = 20 # velocity in micrometers / second
+        self.mean_angle = alpha # angle in rad
+        self.mean_runtime = tau # runtime in seconds
+        self.velocity = v # velocity in micrometers / second
 
     def step(self):
         
@@ -20,4 +21,5 @@ class bacteria:
 
         runtime = np.random.exponential(self.mean_runtime)
         self.pos += self.looking_at * runtime * self.velocity
+        self.total_runtime += runtime
 
