@@ -175,9 +175,13 @@ def sim(N, t, chunk_size, v = 20, tau = 1, alpha = 70 / 180 * np.pi, angle_varia
     remap(pos, os.path.join(out, "positions.npy"))
 
     print(">>> Cleaning up temporary files...")
+    angles._mmap.close()
     os.remove(os.path.join(out, "_angles.npy"))
+    looking_ats._mmap.close()
     os.remove(os.path.join(out, "_looking_ats.npy"))
+    looking_ats_normalized._mmap.close()
     os.remove(os.path.join(out, "_looking_ats_normalized.npy"))
+    pos._mmap.close()
     os.remove(os.path.join(out, "_positions.npy"))
 
     print(">>> Finished!")
